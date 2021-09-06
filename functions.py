@@ -62,7 +62,194 @@ def get_prop_by_ref(props, refid):
     for ref in props:
         if ref['refId'] == refid:
             return ref
-        
+      
+def get_active(prop, cache):
+    '''
+    Gets and updates active proposals
+    Returns title and sets to cache 
+    '''
+
+    if 'active' in cache:
+        if prop['currentState'] == 'active':
+            cache['active'].append(prop)
+            return prop['title']
+        else:
+            if prop in cache['active']:
+                cache['active'].remove(prop)
+                prop['changed_from'] = 'active'
+                return prop
+    else:
+        cache['active'] = []
+        if prop['currentState'] == 'active':
+            cache['active'].append(prop)
+            return prop['title']
+        else:
+            if prop in cache['active']:
+                cache['active'].remove(prop)
+                prop['changed_from'] = 'active'
+                return prop
+    
+
+def get_queued(prop, cache):
+    '''
+    Gets and updates queded proposals
+    Returns title and sets to cache
+    '''
+    if 'queued' in cache:
+        if prop['currentState'] == 'queued':
+            cache['queued'].append(prop)
+            return prop['title']
+        else:
+            if prop in cache['queued']:
+                cache['queued'].remove(prop)
+                prop['changed_from'] = 'queued'
+                return prop
+    else:
+        cache['queued'] = []
+        if prop['currentState'] == 'queued':
+            cache['queued'].append(prop)
+            return prop['title']
+        else:
+            if prop in cache['queued']:
+                cache['queued'].remove(prop)
+                prop['changed_from'] = 'queued'
+                return prop
+
+def get_canceled(prop, cache):
+    '''
+    Gets and updates canceled proposals
+    Returns title and to cache
+    '''
+    if 'canceled' in cache:
+        if prop['currentState'] == 'canceled':
+            cache['canceled'].append(prop)
+            return prop['title']
+        else:
+            if prop in cache['canceled']:
+                cache['canceled'].remove(prop)
+                prop['changed_from'] = 'canceled'
+                return prop
+    else:
+        cache['canceled'] = []
+        if prop['currentState'] == 'canceled':
+            cache['canceled'].append(prop)
+            return prop['title']
+        else:
+            if prop in cache['canceled']:
+                cache['canceled'].remove(prop)
+                prop['changed_from'] = 'canceled'
+                return prop
+
+def get_closed(prop, cache):
+    '''
+    Gets and updated closed proposals 
+    Returns title and to cache
+    '''
+    if 'closed' in cache:
+        if prop['currentState'] == 'closed':
+            cache['closed'].append(prop)
+            return prop['title']
+        else:
+            if prop in cache['closed']:
+                cache['closed'].remove(prop)
+                prop['changed_from'] = 'closed'
+                return prop
+    else:
+        cache['closed'] = []
+        if prop['currentState'] == 'closed':
+            cache['closed'].append(prop)
+            return prop['title']
+        else:
+            if prop in cache['closed']:
+                cache['closed'].remove(prop)
+                prop['changed_from'] = 'closed'
+                return prop
+
+def get_executed(prop, cache):
+    '''
+    Gets and updates executed proposals 
+    Returns title and to cache
+    '''
+    if 'executed' in cache:
+       if prop['currentState'] == 'executed':
+           cache['executed'].append(prop)
+           return prop['title']
+       else:
+           if prop in cache['executed']:
+               cache['executed'].remove(prop)
+               prop['changed_from'] = 'executed'
+               return prop
+    else:
+        cache['executed'] = []
+        if prop['currentState'] == 'executed':
+            cache['executed'].append(prop)
+            return prop['title']
+        else:
+            if prop in cache['executed']:
+                cache['executed'].remove(prop)
+                prop['changed_from'] = 'executed'
+                return prop
+
+
+
+def state_sort(cname_list, cache):
+    '''
+    Parameters
+    ----------
+    cname_list : List
+    cache : dict
+
+    Returns
+    -------
+    active : List
+    que : List
+    canceled : List
+    closed : List
+    exc : List.
+
+    '''
+    active, que, canceled, closed, executed, changed = [],[],[],[],[],[]
+    for i in cname_list:
+        props = br.get_prop_by_cname(i,cache)
+        for prop in props:
+            ac = get_active(prop, cache)
+            qu = get_queued(prop, cache)
+            ca = get_canceled(prop, cache)
+            cl = get_closed(prop, cache)
+            ex = get_executed(prop, cache)
+            if ac:
+                if 'changed_from' in ac:
+                    changed.append(ac)
+                else:
+                    active.append(ac)
+            if qu:
+                if 'changed_from' in qu:
+                    changed.append(qu)
+                else:
+                    que.append(qu)
+            if ca:
+                if 'changed_from' in ca:
+                    changed.append(ca)
+                else:
+                    canceled.append(ca)
+            if cl:
+                if 'changed_from' in cl:
+                    changed.append(cl)
+                else:
+                    closed.append(cl)
+            if ex:
+                if 'changed_from' in ex:
+                    changed.append(ex)
+                else:
+                    executed.append(ex)
+    cache['active_list'] = active
+    cache['queued_list'] = que
+    cache['canceled_list'] = canceled
+    cache['closed_list'] = closed
+    cache['executed_list'] = executed
+    cache['changed_list'] = changed
+    
+    return active, que, canceled, closed, executed, changed
 
 def cmd_msg():
     return """
@@ -70,6 +257,11 @@ COMMANDS
 --------------------
 /menu : List of commands
 /listproto : list of available protocols
+--------------------
+/active: List of all active proposals
+/que: List of all queued proposals
+/canceled: List of all canceled proposals
+/changed: List of changed proposals that have changed status
 --------------------
 $(protocol) : all data from specified protocol
 $(protocol) proposals : lists all proposal titles for protocol
@@ -131,4 +323,17 @@ def ca_msg(proto):
 Network: {proto['tokens'][0]['network']}
 Contract: {proto['tokens'][0]['contractAddress']}'''
     except:
-        return f'''No Contract Found'''
+        return '''No Contract Found'''
+    
+def chg_msg(change_list):
+    temp = []
+    if change_list:
+        for i in change_list:
+            protocol = i['protocol']
+            state = i['currentState']
+            past = i['changed_from']
+            new_str = f"{protocol} protocol changed from {past} to {state}"
+            temp.append(new_str)
+    else:
+        temp.append("No Changed Detected")
+    return temp

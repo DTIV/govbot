@@ -85,9 +85,14 @@ def get_voters(cache):
     '''
     Get voters across all protocols
     '''
-    url = "https://api.boardroom.info/v1/voters"
-    votes = get(url).json()
-    cache['votes'] = votes['data']
+    temp = {}
+    if 'voters' in cache:
+        return cache
+    else:
+        url = "https://api.boardroom.info/v1/voters"
+        votes = get(url).json()
+        temp['all'] = votes['data']
+        cache['voters'] = temp
     return votes
 
 def get_prop_votes(refid, cache):
@@ -103,13 +108,21 @@ def get_voters_cname(cname, cache):
     '''
     Get all voters for a protocol
     '''
-    temp_cache = {}
-    url = "https://api.boardroom.info/v1/protocols/"+cname+"/voters"
-    votes = get(url).json()
-    temp_cache[cname] = votes['data']
-    cache['votes_cname'] = temp_cache
-    return votes
-
+    if 'voters' in cache:
+        if f"{cname}" in cache['voters']:
+            return cache['voters'][cname]
+        else:
+            url = "https://api.boardroom.info/v1/protocols/"+cname+"/voters"
+            votes = get(url).json()
+            cache['voters'][cname] = votes['data']
+            return votes['data']
+    else:
+        get_voters(cache)
+        url = "https://api.boardroom.info/v1/protocols/"+cname+"/voters"
+        votes = get(url).json()
+        cache['voters'][cname] = votes['data']
+        return votes['data']
+        
 def get_voters_votes(addr, cache):
     '''
     Get votes by voter
