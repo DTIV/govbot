@@ -18,13 +18,13 @@ GOVBOT COMMANDS
 /listproto : list of available protocols
 
 --------------------
-/active: List of all active 
+/active: List of all active proposals
 
 /que: List of all queued proposals
 
 /canceled: List of all canceled proposals
 
-/changed: List of changed proposals that have changed status
+/changed: List of proposals that have changed status
 
 --------------------
 $(protocol) set : add protocol for updates on active proposals and changes
