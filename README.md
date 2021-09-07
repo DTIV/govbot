@@ -17,6 +17,7 @@ GOVBOT COMMANDS
 /menu : List of commands
 
 /listproto : list of available protocols
+
 --------------------
 /active: List of all active 
 
@@ -27,13 +28,11 @@ GOVBOT COMMANDS
 /changed: List of changed proposals that have changed status
 
 --------------------
-
 $(protocol) set : add protocol for updates on active proposals and changes
 
 $(protocol) clear : clear protocol from updates
 
 --------------------
-
 $(protocol) : all data from specified protocol
 
 $(protocol) proposals : lists all proposal titles for protocol
@@ -49,10 +48,10 @@ $(protocol) que : gets all queued proposals for a specific protocol
 $(protocol) canceled : gets all canceled proposals for specific protocol 
 
 --------------------
-
 $(protocol) (title): gets specific proposal data
 
 $(protocol) (ref ID): gets specific proposal data
+
 --------------------
 
             
