@@ -14,6 +14,7 @@ cname_list = fn.list_cnames(cache)[0]
 
 @client.event
 async def on_ready():
+    reseter.start()
     channel = client.get_channel(channel_id)
     print("Bot Starting Up!")
     await channel.send("Bot Starting Up!")
@@ -22,7 +23,7 @@ async def on_ready():
     looper.start()
     checker.start()
     updater.start()
-    reseter.start()
+    
     
 @tasks.loop(minutes=5)
 async def looper():
@@ -47,7 +48,13 @@ async def checker():
             complete.append(temp)
     if complete:
         newset = fn.get_random_set(complete)
-        await channel.send(f"{newset['protocol']} - SET UPDATE\n {fn.prop_msg(newset)}")
+        if 'content' in newset:
+            content = newset['content'][:2000]
+            if len(content) < 2000:
+                ns = fn.prop_msg(newset)
+                await channel.send(f"{newset['protocol']} - SET UPDATE\n {ns}\nCONTENT\n {content}")
+        else:
+            await channel.send(f"{newset['protocol']} - SET UPDATE\n {fn.prop_msg(newset)}")
 
 @tasks.loop(minutes=60)
 async def updater():
@@ -58,28 +65,30 @@ async def updater():
         if 'active' in cache:
             newset = fn.get_random_set(cache['active'])
             if 'content' in newset:
-                ns = fn.prop_msg(newset)
                 content = newset['content'][:2000]
-                await channel.send(f"{title}\n\n{ns}\nCONTENT\n\n{content}")
+                if len(content) < 2000:
+                    ns = fn.prop_msg(newset)
+                    await channel.send(f"{title}\n\n{ns}\nCONTENT\n\n{content}")
             else:
                 await channel.send(fn.prop_msg(newset))
     elif(choice==2):
         if 'queued' in cache:
             newset = fn.get_random_set(cache['queued'])
             if 'content' in newset:
-                ns = fn.prop_msg(newset)
-                original = newset['content']
                 content = newset['content'][:2000]
-                await channel.send(f"{title}\n\n{ns}\nCONTENT\n\n{content}")
+                if len(content) < 2000:
+                    ns = fn.prop_msg(newset)
+                    await channel.send(f"{title}\n\n{ns}\nCONTENT\n\n{content}")
             else:
                 await channel.send(fn.prop_msg(newset))
     else:
         if 'canceled' in cache:
             newset = fn.get_random_set(cache['canceled'])
             if 'content' in newset:
-                ns = fn.prop_msg(newset)
                 content = newset['content'][:2000]
-                await channel.send(f"{title}\n\n{ns}\nCONTENT\n\n{content}")
+                if len(content) < 2000:
+                    ns = fn.prop_msg(newset)
+                    await channel.send(f"{title}\n\n{ns}\nCONTENT\n\n{content}")
             else:
                 await channel.send(fn.prop_msg(newset))
                 
