@@ -12,7 +12,6 @@ This is a Discord Gorvernace Explorer Bot that uses keyword commands to retrieve
 ------- COMMANDS -------
 
 GOVBOT COMMANDS
-
 --------------------
 /menu : List of commands
 
