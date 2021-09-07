@@ -16,7 +16,6 @@ cname_list = fn.list_cnames(cache)[0]
 async def on_ready():
     reseter.start()
     channel = client.get_channel(channel_id)
-    print("Bot Starting Up!")
     await channel.send("Bot Starting Up!")
     fn.state_sort(cname_list, cache)
     await channel.send(fn.cmd_msg())
@@ -27,7 +26,6 @@ async def on_ready():
     
 @tasks.loop(minutes=5)
 async def looper():
-    print("running 5 minute loop")
     channel = client.get_channel(channel_id)
     fn.cache_reset(cache)
     active, que, canceled, closed, executed, changed = fn.state_sort(cname_list, cache)
@@ -38,7 +36,6 @@ async def looper():
 
 @tasks.loop(minutes=10)
 async def checker():
-    print("print running 10 min loop")
     channel = client.get_channel(channel_id)
     complete = []
     if 'set_tickers' in cache:
@@ -50,13 +47,14 @@ async def checker():
             complete.append(temp)
     if complete:
         newset = fn.get_random_set(complete)
-        if 'content' in newset:
-            content = newset['content'][:2000]
-            if len(content) < 2000:
-                ns = fn.prop_msg(newset)
-                await channel.send(f"{newset['protocol']} - SET UPDATE\n {ns}\nCONTENT\n {content}")
-        else:
-            await channel.send(f"{newset['protocol']} - SET UPDATE\n {fn.prop_msg(newset)}")
+        if newset:
+            if 'content' in newset:
+                content = newset['content'][:2000]
+                if len(content) < 2000:
+                    ns = fn.prop_msg(newset)
+                    await channel.send(f"{newset['protocol']} - SET UPDATE\n {ns}\nCONTENT\n {content}")
+            else:
+                await channel.send(f"{newset['protocol']} - SET UPDATE\n {fn.prop_msg(newset)}")
 
 @tasks.loop(minutes=60)
 async def updater():
