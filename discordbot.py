@@ -27,6 +27,7 @@ async def on_ready():
     
 @tasks.loop(minutes=5)
 async def looper():
+    print("running 5 minute loop")
     channel = client.get_channel(channel_id)
     fn.cache_reset(cache)
     active, que, canceled, closed, executed, changed = fn.state_sort(cname_list, cache)
@@ -37,6 +38,7 @@ async def looper():
 
 @tasks.loop(minutes=10)
 async def checker():
+    print("print running 10 min loop")
     channel = client.get_channel(channel_id)
     complete = []
     if 'set_tickers' in cache:
@@ -58,6 +60,7 @@ async def checker():
 
 @tasks.loop(minutes=60)
 async def updater():
+    print("running one hour loop!")
     channel = client.get_channel(channel_id)
     choice = random.choice([1,2,3])
     title = "ONE HOUR RANDOM ACTIVE PROPOSAL UPDATE TIME"

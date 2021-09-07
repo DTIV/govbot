@@ -305,7 +305,8 @@ def get_random_set(complete_list):
         if type(s) is dict:
             if s not in temp:
                 temp.append(s)
-    return random.choice(temp)
+    if temp:
+        return random.choice(temp)
     
 
 def cmd_msg():
