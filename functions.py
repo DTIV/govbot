@@ -365,8 +365,11 @@ def prop_msg(ref):
     end_ts = ref['endTimestamp']
     dt_start = datetime.fromtimestamp(start_ts)
     dt_end = datetime.fromtimestamp(end_ts)
-    bs = ref['startTime']['blockNumber']
-    be = ref['endTime']['blockNumber']
+    if 'blockNumber' in ref['startTime']:
+        bs = ref['startTime']['blockNumber']
+        be = ref['endTime']['blockNumber']
+    else:
+        bs, be = None, None
     return f'''
 {ref['title']}           {state}
 --------------------

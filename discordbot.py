@@ -20,6 +20,9 @@ async def on_ready():
     fn.state_sort(cname_list, cache)
     await channel.send(fn.cmd_msg())
     looper.start()
+    checker.start()
+    updater.start()
+    reseter.start()
     
 @tasks.loop(minutes=5)
 async def looper():
@@ -34,39 +37,51 @@ async def looper():
 @tasks.loop(minutes=10)
 async def checker():
     channel = client.get_channel(channel_id)
+    complete = []
     if 'set_tickers' in cache:
-        complete = []
         for sett in cache['set_tickers']:
             ac = fn.get_active_cname(sett, cache)
             qu = fn.get_que_cname(sett, cache)
             can = fn.get_canceled_cname(sett, cache)
             temp = [*ac,*qu,*can]
             complete.append(temp)
-    newset = fn.get_random_set(complete)
-    await channel.send('\n'.join(fn.prop_msg(newset)))
+    if complete:
+        newset = fn.get_random_set(complete)
+        await channel.send(f"{newset['protocol']} - SET UPDATE\n {fn.prop_msg(newset)}")
 
 @tasks.loop(minutes=60)
 async def updater():
     channel = client.get_channel(channel_id)
     choice = random.choice([1,2,3])
+    title = "ONE HOUR RANDOM ACTIVE PROPOSAL UPDATE TIME"
     if choice == 1:
         if 'active' in cache:
             newset = fn.get_random_set(cache['active'])
-            await channel.send('\n'.join(fn.prop_msg(newset)))
             if 'content' in newset:
-                await channel.send("CONTENT\n\n",newset['content'])
+                ns = fn.prop_msg(newset)
+                content = newset['content'][:2000]
+                await channel.send(f"{title}\n\n{ns}\nCONTENT\n\n{content}")
+            else:
+                await channel.send(fn.prop_msg(newset))
     elif(choice==2):
         if 'queued' in cache:
             newset = fn.get_random_set(cache['queued'])
-            await channel.send('\n'.join(fn.prop_msg(newset)))
             if 'content' in newset:
-                await channel.send("CONTENT\n\n",newset['content'])
+                ns = fn.prop_msg(newset)
+                original = newset['content']
+                content = newset['content'][:2000]
+                await channel.send(f"{title}\n\n{ns}\nCONTENT\n\n{content}")
+            else:
+                await channel.send(fn.prop_msg(newset))
     else:
         if 'canceled' in cache:
             newset = fn.get_random_set(cache['canceled'])
-            await channel.send('\n'.join(fn.prop_msg(newset)))
             if 'content' in newset:
-                await channel.send("CONTENT\n\n",newset['content'])
+                ns = fn.prop_msg(newset)
+                content = newset['content'][:2000]
+                await channel.send(f"{title}\n\n{ns}\nCONTENT\n\n{content}")
+            else:
+                await channel.send(fn.prop_msg(newset))
                 
 @tasks.loop(hours=24)
 async def reseter():
